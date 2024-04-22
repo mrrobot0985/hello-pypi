@@ -1,2 +1,4 @@
 # hello-pypi
-A Simple python package.
+
+A Simple example python package repository.
+
