@@ -1,3 +1,3 @@
 # __init__.py
 
-from .main import cli_client
+from .cli import cli_client

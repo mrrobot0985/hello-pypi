@@ -1,49 +1,28 @@
+# main.py
+import importlib
 import os
 import argparse
-from .utils import get_version  # Function to retrieve the version from the correct source
 
-# Fetching the current user's name, defaulting to 'User' if not found
-current_user = os.environ.get('USER', 'User')
+class ArgumentParser:
+    def __init__(self):
+        self.parser = argparse.ArgumentParser(description="Dynamic CLI")
+        self.subparsers = self.parser.add_subparsers(dest="command", help="Available commands")
 
-def print_welcome_message():
-    """
-    Display a welcome message when no arguments are provided.
-    """
-    print(f"Hello {current_user}!")
-    print("Available commands:")
-    print("  --version  Show the version of the CLI client")
+        # Discover submodules in the 'commands' directory
+        self.load_submodules()
 
-def create_argument_parser():
-    """
-    Create and return an argument parser for the CLI client.
-    """
-    parser = argparse.ArgumentParser(
-        description="A simple command-line client",
-        add_help=True  # Adds the default help argument (-h, --help)
-    )
-    
-    # Adding the '--version' argument
-    parser.add_argument(
-        "--version",
-        action="version",
-        version=get_version(),
-        help="Show the version of the CLI client"
-    )
+    def load_submodules(self):
+        # Dynamically import submodules from 'commands' directory
+        command_dir = os.path.dirname(__file__) + "/commands"
+        for file_name in os.listdir(command_dir):
+            if file_name.endswith(".py") and not file_name.startswith("__"):
+                module_name = "user_cli.commands." + file_name[:-3]
+                module = importlib.import_module(module_name)
+                
+                # Check if the module has 'add_subcommand' function
+                if hasattr(module, "add_subcommand"):
+                    # Pass the subparser reference to the module's add_subcommand
+                    module.add_subcommand(self.subparsers)
 
-    return parser
-
-def cli_client():
-    """
-    Command-line interface (CLI) client entry point.
-    """
-    parser = create_argument_parser()
-
-    # Parse command-line arguments
-    args = parser.parse_args()
-
-    # If no arguments are provided, print the welcome message
-    if not vars(args):  # vars(args) returns a dictionary of arguments
-        print_welcome_message()
-
-if __name__ == "__main__":
-    cli_client()
+    def parse_arguments(self):
+        return self.parser.parse_args()

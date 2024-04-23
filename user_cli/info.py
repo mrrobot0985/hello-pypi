@@ -122,7 +122,7 @@ class ModuleMetadata:
         Get Git metadata, including tag, author, email, branch, commit hash, commit message, and commit date.
         """
         git_data = {
-            "git_tag": self._run_command(["git", "describe", "--tags", "--abbrev=0"]) or "N/A",
+            "git_tag": self.get_latest_git_tag() or "N/A",
             "git_username": self._run_command(["git", "config", "user.name"]) or "N/A",
             "git_email": self._run_command(["git", "config", "user.email"]) or "N/A",
             "git_branch": self._run_command(["git", "rev-parse", "--abbrev-ref", "HEAD"]) or "N/A",
